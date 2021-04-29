@@ -1,6 +1,7 @@
 import React from "react";
 import { GetStaticProps } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { api } from "../services/api";
 import { format, parseISO } from "date-fns";
 import { convertDurationToTimeString } from "../utils/convertDurationToTimeToString";
@@ -42,7 +43,9 @@ export default function Home({ lastedEpisodes, allEpisodes }: HomeProps) {
                 />
 
                 <div className={styles.episodeDetails}>
-                  <a href="">{episode.title}</a>
+                  <Link href={`/episodes/${episode.id}`}>
+                    <a>{episode.title}</a>
+                  </Link>
                   <p>{episode.members}</p>
 
                   <span>{episode.publishedAt}</span>
@@ -70,32 +73,35 @@ export default function Home({ lastedEpisodes, allEpisodes }: HomeProps) {
           </thead>
 
           <tbody>
-            {allEpisodes.map(episode => {
+            {allEpisodes.map((episode) => {
               return (
                 <tr>
-                <td style= {{width: 100}}>
-                  <Image width={120}
-                  height={120}
-                  src={episode.thumbnail}
-                  alt={episode.title}
-                  objectFit="cover"
-                  />
-                </td>
+                  <td style={{ width: 100 }}>
+                    <Image
+                      width={120}
+                      height={120}
+                      src={episode.thumbnail}
+                      alt={episode.title}
+                      objectFit="cover"
+                    />
+                  </td>
 
-                <td>
-                  <a href="">{episode.title}</a>
-                </td>
+                  <td>
+                    <Link href={`/episodes/${episode.id}`}>
+                      <a>{episode.title}</a>
+                    </Link>
+                  </td>
 
-                <td>{episode.members}</td>
-                <td  style={{width: 100}}>{episode.publishedAt}</td>
-                <td>{episode.durationAsString}</td>
-                <td>
-                  <button type="button">
-                  <img src="./play-green.svg" alt="playbuttonep" />
-                  </button>
-                </td>
-            </tr>
-              )
+                  <td>{episode.members}</td>
+                  <td style={{ width: 100 }}>{episode.publishedAt}</td>
+                  <td>{episode.durationAsString}</td>
+                  <td>
+                    <button type="button">
+                      <img src="./play-green.svg" alt="playbuttonep" />
+                    </button>
+                  </td>
+                </tr>
+              );
             })}
           </tbody>
         </table>
