@@ -1,10 +1,12 @@
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
-import { GetStaticProps } from "next";
+import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
 import { api } from "../../services/api";
+import Image from "next/image";
+import Link from 'next/link';
 import { convertDurationToTimeString } from "../../utils/convertDurationToTimeToString";
-
+import styles from "./episode.module.scss";
 
 type Episode = {
   id: string;
@@ -18,15 +20,51 @@ type Episode = {
   publishedAt: string;
 };
 
-type HomeProps = {
-Episode: Episode[];
+type EpisodeProps = {
+  episode: Episode;
 };
 
-export default function Episode({episode}) {
-  const router = useRouter();
+export default function Episode({ episode }: EpisodeProps) {
+  return (
+    <div className={styles.episode}>
+      <div className={styles.thumbnailContainer}>
+        <Link href="/">
+        <button type="button">
+          <img src="/arrow-left.svg" alt="back" />
+        </button>
+        </Link>
+        <Image
+          width={700}
+          height={160}
+          src={episode.thumbnail}
+          objectFit="cover"
+        />
 
-  return <h1>{router.query.slug}</h1>;
+        <button type="button">
+          <img src="/play.svg" alt="play" />
+        </button>
+      </div>
+
+      <header>
+        <h1>{episode.title}</h1>
+        <span>{episode.members}</span>
+        <span>{episode.publishedAt}</span>
+        <span>{episode.durationAsString}</span>
+      </header>
+
+      <div
+       className={styles.description} 
+       dangerouslySetInnerHTML={{__html: episode.description}}/>
+    </div>
+  );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
   const { slug } = ctx.params;
@@ -40,9 +78,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     members: data.members,
     publishedAt: format(parseISO(data.published_at), "d MMM yy"),
     duration: Number(data.file.duration),
-    durationAsString: convertDurationToTimeString(
-      Number(data.file.duration)
-    ),
+    durationAsString: convertDurationToTimeString(Number(data.file.duration)),
     description: data.description,
     url: data.file.url,
   };
